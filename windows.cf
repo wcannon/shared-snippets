@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Launch two Windows Server instances
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable RDP access
+    Type: AWS::EC2::KeyPair::KeyName
+  ImageId:
+    Description: AMI to use
+    Type: string
+  SubnetId:
+    Description: SubnetId to place server into
+    Type: string
+  SecurityGroupId:
+    Type: string
+
+Resources:
+
+  # Windows Server Instances
+  WindowsServerInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      ImageId: !Ref ImageId
+      SubnetId: !Ref SubnetId
+      SecurityGroupId:
+        - !Ref SecurityGroupId
+      Tags:
+        - Key: Name
+          Value: WindowsServerJumpBox
