@@ -41,47 +41,64 @@
         },
         "DaaSSGIngress": {
             "Type": "AWS::EC2::SecurityGroupIngress",
-            "Properties": [
-                {
+            "Properties": {
                     "IpProtocol": "tcp",
                     "FromPort": 5986,
                     "ToPort": 5986,
-                    "SourceSecurityGroupName": {
-                        "Ref": "AutomationSG"
-                    }
+                    "SourceSecurityGroupId": {
+                        "Fn::GetAtt": ["AutomationSG", "GroupId"]
+                    },
+                   "GroupId": {
+                       "Fn::GetAtt": [
+                           "DaaSSG",
+                           "GroupId"
+                       ]
+                   }
                 }
-            ]
         },
-        "AutomationSGIngress": {
+        "AutomationSGIngress1": {
             "Type": "AWS::EC2::SecurityGroupIngress",
-            "Properties": [
-                {
+            "Properties": {
                     "IpProtocol": "tcp",
                     "FromPort": 443,
                     "ToPort": 443,
-                    "SourceSecurityGroupName": {
-                        "Ref": "DaaSSG"
-                    }
-                },
-                {
+                    "SourceSecurityGroupId": {
+                        "Fn::GetAtt": ["DaaSSG", "GroupId"]
+                    },
+                   "GroupId": {
+                       "Fn::GetAtt": [
+                           "AutomationSG",
+                           "GroupId"
+                       ]
+                   }
+                }
+        },
+        "AutomationSGIngress2": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
                     "IpProtocol": "tcp",
                     "FromPort": 24020,
                     "ToPort": 24020,
-                    "SourceSecurityGroupName": {
-                        "Ref": "DaaSSG"
-                    }
+                    "SourceSecurityGroupId": {
+                        "Fn::GetAtt": ["DaaSSG", "GroupId"]
+                    },
+                   "GroupId": {
+                       "Fn::GetAtt": [
+                           "AutomationSG",
+                           "GroupId"
+                       ]
+                   }
                 }
-            ]
         }
     },
     "Outputs": {
-        "SG_DaaSSG": {
+        "SGDaaSSG": {
             "Description": "ID of DaaSSG security group",
             "Value": {
                 "Ref": "DaaSSG"
             }
         },
-        "SG_AutomationSG": {
+        "SGAutomationSG": {
             "Description": "ID of AutomationSG security group",
             "Value": {
                 "Ref": "AutomationSG"
