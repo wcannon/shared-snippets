@@ -1,0 +1,91 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "pVPCID": {
+            "Description": "VPC ID to place daas instances and daas automation security groups",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "DaaSSG": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Purpose: SG for workspace personal, pools, and appstream instances",
+                "GroupName": "daas_instances",
+                "VpcId": {
+                    "Ref": "pVPCID"
+                },
+                "Tags": [
+                    {
+                        "Key": "Purpose",
+                        "Value": "daas instances winrm available"
+                    }
+                ]
+            }
+        },
+        "AutomationSG": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Purpose: SG for automation ec2 instances e.g. ansible, chocolatey",
+                "GroupName": "daas_automation",
+                "VpcId": {
+                    "Ref": "pVPCID"
+                },
+                "Tags": [
+                    {
+                        "Key": "Purpose",
+                        "Value": "daas automation ec2 instances"
+                    }
+                ]
+            }
+        },
+        "DaaSSGIngress": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 5986,
+                    "ToPort": 5986,
+                    "SourceSecurityGroupName": {
+                        "Ref": "AutomationSG"
+                    }
+                }
+            ]
+        },
+        "AutomationSGIngress": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "SourceSecurityGroupName": {
+                        "Ref": "DaaSSG"
+                    }
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 24020,
+                    "ToPort": 24020,
+                    "SourceSecurityGroupName": {
+                        "Ref": "DaaSSG"
+                    }
+                }
+            ]
+        }
+    },
+    "Outputs": {
+        "SG_DaaSSG": {
+            "Description": "ID of DaaSSG security group",
+            "Value": {
+                "Ref": "DaaSSG"
+            }
+        },
+        "SG_AutomationSG": {
+            "Description": "ID of AutomationSG security group",
+            "Value": {
+                "Ref": "AutomationSG"
+            }
+        }
+    }
+}
